@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forza Horizon 6 Randomizer</title>
+<style>
+:root {
+  --bg: #0d0f14;
+  --panel: #151922;
+  --panel2: #1b2130;
+  --text: #f5f7fb;
+  --muted: #9aa4b2;
+  --line: #2b3444;
+  --accent: #f44dd0;
+  --accent2: #6de2ff;
+  --good: #65e6a6;
+  --warn: #ffcc66;
+  --shadow: 0 18px 50px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(circle at 20% -10%, rgba(244,77,208,.18), transparent 36rem),
+    radial-gradient(circle at 100% 0%, rgba(109,226,255,.12), transparent 32rem),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+button, select, input { font: inherit; }
+.app {
+  width: min(1180px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 28px 0 50px;
+}
+header {
+  display:flex;
+  justify-content:space-between;
+  gap:18px;
+  align-items:flex-end;
+  margin-bottom:22px;
+}
+h1 {
+  margin:0;
+  font-size:clamp(2rem,5vw,4rem);
+  line-height:.95;
+  letter-spacing:-.045em;
+}
+.subtitle {
+  color:var(--muted);
+  margin-top:10px;
+  max-width:720px;
+}
+.badge {
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  padding:8px 11px;
+  border-radius:999px;
+  color:var(--muted);
+  white-space:nowrap;
+}
+.grid {
+  display:grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap:18px;
+}
+.panel {
+  background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.015));
+  border:1px solid var(--line);
+  border-radius:22px;
+  box-shadow:var(--shadow);
+}
+.controls { padding:20px; }
+.result { padding:20px; }
+.section-title {
+  font-size:.8rem;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--muted);
+  margin:0 0 10px;
+}
+.control-row {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:14px;
+}
+.field label {
+  display:block;
+  font-size:.82rem;
+  color:var(--muted);
+  margin:0 0 6px 2px;
+}
+select {
+  width:100%;
+  appearance:none;
+  background:var(--panel2);
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:11px 12px;
+}
+.checks {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.chip {
+  position:relative;
+}
+.chip input {
+  position:absolute;
+  opacity:0;
+  pointer-events:none;
+}
+.chip span {
+  display:block;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:8px 11px;
+  color:var(--muted);
+  background:rgba(255,255,255,.025);
+  cursor:pointer;
+  user-select:none;
+  transition:.15s ease;
+}
+.chip input:checked + span {
+  color:#fff;
+  border-color:rgba(244,77,208,.65);
+  background:rgba(244,77,208,.13);
+  box-shadow:inset 0 0 0 1px rgba(244,77,208,.18);
+}
+.split {
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+}
+.tiny {
+  color:var(--muted);
+  font-size:.78rem;
+}
+.primary {
+  border:0;
+  border-radius:14px;
+  padding:14px 18px;
+  background:linear-gradient(100deg,var(--accent),#8d5cff);
+  color:white;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 8px 28px rgba(244,77,208,.25);
+}
+.primary:hover { transform:translateY(-1px); }
+.secondary {
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:9px 12px;
+  background:var(--panel2);
+  color:var(--text);
+  cursor:pointer;
+}
+.actions {
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+.roll {
+  display:grid;
+  gap:12px;
+}
+.card {
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  min-height:116px;
+  background:
+    linear-gradient(135deg, rgba(109,226,255,.045), transparent 45%),
+    rgba(255,255,255,.02);
+}
+.card h2 {
+  margin:3px 42px 5px 0;
+  font-size:clamp(1.35rem,3vw,2.15rem);
+  line-height:1.02;
+  letter-spacing:-.03em;
+}
+.card .eyebrow {
+  color:var(--accent2);
+  text-transform:uppercase;
+  font-size:.72rem;
+  letter-spacing:.13em;
+  font-weight:800;
+}
+.meta {
+  color:var(--muted);
+  font-size:.88rem;
+}
+.icon-btn {
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--muted);
+  cursor:pointer;
+}
+.icon-btn.locked {
+  color:var(--warn);
+  border-color:rgba(255,204,102,.45);
+  background:rgba(255,204,102,.08);
+}
+.footer-note {
+  color:var(--muted);
+  font-size:.78rem;
+  margin-top:12px;
+}
+details {
+  margin-top:16px;
+  border-top:1px solid var(--line);
+  padding-top:14px;
+}
+summary {
+  cursor:pointer;
+  color:var(--muted);
+}
+.multi-list {
+  margin-top:10px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+  max-height:250px;
+  overflow:auto;
+  padding-right:4px;
+}
+.multi-list label {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.88rem;
+  color:var(--muted);
+}
+.counter {
+  margin-left:auto;
+  color:var(--good);
+  font-weight:700;
+}
+hr {
+  border:0;
+  border-top:1px solid var(--line);
+  margin:18px 0;
+}
+.empty {
+  padding:16px;
+  border:1px dashed var(--line);
+  border-radius:14px;
+  color:var(--warn);
+  display:none;
+}
+@media (max-width: 850px) {
+  header { align-items:flex-start; flex-direction:column; }
+  .grid { grid-template-columns:1fr; }
+}
+@media (max-width: 560px) {
+  .control-row, .multi-list { grid-template-columns:1fr; }
+  .app { width:min(100% - 18px,1180px); padding-top:18px; }
+}
+
+.compat-toggle {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  margin-top:14px;
+  padding:12px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+  cursor:pointer;
+}
+.compat-toggle input { margin-top:3px; }
+.compat-toggle span {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+.compat-toggle strong { font-size:.9rem; }
+.compat-toggle small {
+  color:var(--muted);
+  font-size:.78rem;
+}
+.compat-warning {
+  display:none;
+  margin-top:12px;
+  padding:10px 12px;
+  border:1px solid rgba(255,204,102,.4);
+  border-radius:12px;
+  background:rgba(255,204,102,.08);
+  color:var(--warn);
+  font-size:.82rem;
+}
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div>
+      <h1>FH6 Randomizer</h1>
+      <div class="subtitle">Pick a random car category, performance class, and event from the Forza Horizon 6 datasets. Filter the pools, lock anything you like, then reroll the rest.</div>
+    </div>
+    <div class="badge"><span id="eventCount"></span> eligible events</div>
+  </header>
+
+  <div class="grid">
+    <section class="panel controls">
+      <div class="section-title">Challenge pool</div>
+
+      <div class="control-row">
+        <div class="field">
+          <label for="activityFilter">Activity</label>
+          <select id="activityFilter">
+            <option value="All">All activities</option>
+            <option value="Race Event">Race events only</option>
+            <option value="PR Stunt">PR stunts only</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="disciplineFilter">Discipline</label>
+          <select id="disciplineFilter"><option value="All">All disciplines</option></select>
+        </div>
+      </div>
+
+      <div class="control-row">
+        <div class="field">
+          <label for="typeFilter">Event type</label>
+          <select id="typeFilter"><option value="All">All event types</option></select>
+        </div>
+        <div class="field">
+          <label for="tempFilter">Availability</label>
+          <select id="tempFilter">
+            <option value="all">Permanent + current temporary</option>
+            <option value="permanent">Permanent only</option>
+            <option value="temporary">Temporary only</option>
+          </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="split">
+        <div>
+          <div class="section-title">Performance class</div>
+          <div class="tiny">Choose which classes can roll.</div>
+        </div>
+        <button class="secondary" id="toggleClasses">Toggle all</button>
+      </div>
+      <div class="checks" id="classChecks" style="margin-top:10px"></div>
+
+      <label class="compat-toggle">
+        <input type="checkbox" id="compatibilityToggle" checked>
+        <span>
+          <strong>Enforce car/class compatibility</strong>
+          <small>Prevents obviously impossible rolls like C-class Drift Cars.</small>
+        </span>
+      </label>
+
+      <details>
+        <summary>Car type filters <span class="counter" id="carTypeCount"></span></summary>
+        <div class="actions" style="margin-top:10px">
+          <button class="secondary" id="selectAllCars">Select all</button>
+          <button class="secondary" id="clearCars">Clear</button>
+        </div>
+        <div class="multi-list" id="carTypeChecks"></div>
+      </details>
+
+      <div class="actions">
+        <button class="primary" id="rollAll">ROLL CHALLENGE</button>
+        <button class="secondary" id="resetFilters">Reset filters</button>
+      </div>
+    </section>
+
+    <section class="panel result">
+      <div class="section-title">Current roll</div>
+      <div class="empty" id="emptyMessage">Your filters leave no eligible events or car types.</div>
+
+      <div class="roll" id="rollArea">
+        <div class="card">
+          <div class="eyebrow">Car Type</div>
+          <h2 id="carResult">—</h2>
+          <div class="meta" id="carMeta">Forza category</div>
+          <button class="icon-btn" data-lock="car" title="Lock car type">🔓</button>
+        </div>
+
+        <div class="card">
+          <div class="eyebrow">Performance Class</div>
+          <h2 id="classResult">—</h2>
+          <div class="meta" id="classMeta">PI range</div>
+          <button class="icon-btn" data-lock="class" title="Lock performance class">🔓</button>
+        </div>
+
+        <div class="card">
+          <div class="eyebrow">Event</div>
+          <h2 id="eventResult">—</h2>
+          <div class="meta" id="eventMeta">Activity · Discipline · Type</div>
+          <button class="icon-btn" data-lock="event" title="Lock event">🔓</button>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="secondary" id="rerollCar">Reroll car</button>
+        <button class="secondary" id="rerollClass">Reroll class</button>
+        <button class="secondary" id="rerollEvent">Reroll event</button>
+      </div>
+
+      <div class="compat-warning" id="compatWarning"></div>
+      <div class="footer-note">Locks are local to this page session. Filters and selections are saved in your browser automatically.</div>
+    </section>
+  </div>
+</div>
+
+<script>
+const EVENTS = [{"name": "Izu Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Ruriko-ji Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Shimanoyama Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Shinjuku Gyoen Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Soni Highlands Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Takashiro Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Tateyama Alpine Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Temple Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Wind Farm Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Yahikoyama Cross Country", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "City Docks Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Edogawa Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Legend Island Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Nangan Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Naruo Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Oka Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Snow Forest Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Stadium Cross Country Circuit", "activity": "Race Event", "discipline": "Cross Country", "type": "Cross Country Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "The Titan", "activity": "Race Event", "discipline": "Cross Country", "type": "Finale", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "The Gauntlet", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Finale", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Bamboo Forest Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Chiheisen Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Hirosaki Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Horizon Stadium Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Ine Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Kawazu Nanadaru Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Sekibe Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Sotoyama Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Sunflower Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Taiyaki Scramble", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Scramble", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Airfield Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Cherry Field Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Hokubu Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Ito Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Kinkaku-ji Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Legend Island Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Nukabira Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Oyashirazu Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Takashiro Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Waterfall Trail", "activity": "Race Event", "discipline": "Dirt Racing", "type": "Trail", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Horizon Festival Drag Strip", "activity": "Race Event", "discipline": "Drag Racing", "type": "Drag Racing Event", "route": "Drag strip", "permanent": true, "availability": "Permanent"}, {"name": "Irokawa Space Center Drag Strip", "activity": "Race Event", "discipline": "Drag Racing", "type": "Drag Racing Event", "route": "Drag strip", "permanent": true, "availability": "Permanent"}, {"name": "Ito Airfield Drag Strip", "activity": "Race Event", "discipline": "Drag Racing", "type": "Drag Racing Event", "route": "Drag strip", "permanent": true, "availability": "Permanent"}, {"name": "Daikoku Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Edamame Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": false, "availability": "Series 4: Horizon Mascot Party (temporary)"}, {"name": "Electric Town Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Highway Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Hokubu Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Irokawa Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Legend Island Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Narai-Juku Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Shimanoyama Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Shirakawa Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Soni Circuit", "activity": "Race Event", "discipline": "Road Racing", "type": "Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "The Colossus", "activity": "Race Event", "discipline": "Road Racing", "type": "Finale", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "The Goliath", "activity": "Race Event", "discipline": "Road Racing", "type": "Finale", "route": "Loop / endurance", "permanent": true, "availability": "Permanent"}, {"name": "Coastline Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Festival Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Ito Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Satta Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Seaside Park Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Shikisai Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Shimanoyama Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Tateyama Kurobe Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo Railway Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Venus Sprint", "activity": "Race Event", "discipline": "Road Racing", "type": "Sprint", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Cedar Run", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Daikoku Chase", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Festival Chase", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Hokubu Ascent", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Kita Ine", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Matsumi Climb", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Minami Chase", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Nachi Run", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Norikura Descent", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Okishinaimura Run", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Rainbow Bridge Descent", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "River Descent", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Shimanoyama Charge", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Sunflower Charge", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo City Docks Charge", "activity": "Race Event", "discipline": "Street Racing", "type": "Street Race", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Edamame Time Attack Circuit", "activity": "Race Event", "discipline": "Time Attack", "type": "Time Attack Circuit", "route": "Circuit", "permanent": false, "availability": "Series 4: Horizon Mascot Party (temporary)"}, {"name": "Hokubu Time Attack", "activity": "Race Event", "discipline": "Time Attack", "type": "Time Attack Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Legend Island Time Attack", "activity": "Race Event", "discipline": "Time Attack", "type": "Time Attack Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Sekibe Time Attack", "activity": "Race Event", "discipline": "Time Attack", "type": "Time Attack Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Soni Time Attack", "activity": "Race Event", "discipline": "Time Attack", "type": "Time Attack Circuit", "route": "Circuit", "permanent": true, "availability": "Permanent"}, {"name": "Arashiyama Takao", "activity": "Race Event", "discipline": "Touge", "type": "Touge Battle", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Bandai Azuma", "activity": "Race Event", "discipline": "Touge", "type": "Touge Battle", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Hakone Nanamagari", "activity": "Race Event", "discipline": "Touge", "type": "Touge Battle", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Mt. Haruna", "activity": "Race Event", "discipline": "Touge", "type": "Touge Battle", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Norikura Skyline", "activity": "Race Event", "discipline": "Touge", "type": "Touge Battle", "route": "Point-to-point", "permanent": true, "availability": "Permanent"}, {"name": "Airfield Take-Off", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Alpine Heights", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Azure Drive", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Circuit Leap", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Clifftop Crest", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Farmland Falls", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Festival Leap", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Highlands", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Highway Jump", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Irokawa Launch", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Mt. Fuji View", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Nangan Heights", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Railway Bridge", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Rollercoaster Leap", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Seaside Heights", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Shirakawa-go", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Stadium Jump", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Tanbo Launch", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo City Dockside", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo City Lookout", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Danger Sign", "route": "Jump", "permanent": true, "availability": "Permanent"}, {"name": "Bandai Azuma Skyline", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Cedar Grove", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Hairpin", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Hakone Nanamagari", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Inner City Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Kawazu Nanadaru Loop Bridge", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Kodachi Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Meoto Iwa Turn", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Minamino Horseshoe", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Mt. Haruna", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Nukabira Turn", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Red Road", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "River Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Seaside Trail", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Shirakawa Curves", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Shiro Switch", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Sunflower Fields", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Thunderbird", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo City Docks", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Turbine Trail", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Drift Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Airfield Runway", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Akihabara Straight", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Bamboo Hilltop", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Cedar Woodland", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Crop Fields", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Crossover", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Daikoku Parking Area", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Festival Line", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Flower Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Highland Road", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Hirosaki Castle", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Ine Beach", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Irabu Ohashi Bridge", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Island Road", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Ito Straight", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Izu Skyline", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Jodogahama Grove", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Lake Viewing", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Lakeside Valley", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Main Street", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Nangan Turn", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Rainbow Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "River Split", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Riverside", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Shibuya Crossing", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Shirakawa-go Straight", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Snowbank", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Stadium Back Road", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Takashiro Bridge", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Tokyo City Run-Up", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Trap", "route": "Measured point", "permanent": true, "availability": "Permanent"}, {"name": "Airfield Grove", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Arashiyama Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "City Sights", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Coastal Cliffside", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Deep Forest", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Farmland Curve", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Festival Loop", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Forest Straight", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Fuji Shibazakura", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Hakone Turns", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Hanado", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Highway View", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Hirosaki Tangle", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Ine Backstreet", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Kōzokudō", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Matsumi Curve", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Minamino Curve", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Mountain Pass", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Ocean Highway", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Okishinaimura", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Pylons", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Seaside Park", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Snow Slopes", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Tall Trees", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Tateyama Kurobe Alpine Route", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Tea Farm", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Temple Run-Up", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Underground Tunnel", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Yahikoyama Curve", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Yama Trail", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Speed Zone", "route": "Measured road segment", "permanent": true, "availability": "Permanent"}, {"name": "Bridge Underpasses", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Coastal Descent", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Forest Cut-Through", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Horizon Kaido", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Kodachi Descent", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Kudarizaka", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Mountain Descent", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Nachi Falls", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "On Par", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Ropeway Run", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}, {"name": "Sekibe Kaijo", "activity": "PR Stunt", "discipline": "PR Stunt", "type": "Trailblazer", "route": "Point-to-point off-road", "permanent": true, "availability": "Permanent"}];
+const CAR_TYPES = ["Buggies", "Classic Muscle", "Classic Racers", "Classic Rally", "Classic Sports Cars", "Cult Cars", "Drift Cars", "Eclectic Domestics", "Extreme Track Toys", "GT Cars", "Hot Hatch", "Hypercars", "Modern Muscle", "Modern Rally", "Modern Sports Cars", "Modern Super Saloons", "Modern Supercars", "Offroad", "Pickups & 4x4's", "Rally Monsters", "Rare Classics", "Retro Hot Hatch", "Retro Muscle", "Retro Racers", "Retro Rally", "Retro Sports Cars", "Retro Super Saloons", "Retro Supercars", "Rods and Customs", "Sports Utility Heroes", "Super GT", "Super Hot Hatch", "Track Toys", "Unlimited Buggies", "Unlimited Offroad", "Utility Heroes", "UTV's"];
+const CLASSES = [{"name": "D", "pi": "100–500"}, {"name": "C", "pi": "501–600"}, {"name": "B", "pi": "601–700"}, {"name": "A", "pi": "701–800"}, {"name": "S1", "pi": "801–900"}, {"name": "S2", "pi": "901–998"}, {"name": "X", "pi": "999"}];
+
+const CAR_CLASS_COMPAT = {
+  "Buggies": ["D","C","B","A","S1"],
+  "Classic Muscle": ["D","C","B","A","S1"],
+  "Classic Racers": ["C","B","A","S1"],
+  "Classic Rally": ["D","C","B","A"],
+  "Classic Sports Cars": ["D","C","B","A","S1"],
+  "Cult Cars": ["D","C","B","A"],
+  "Drift Cars": ["S1","S2","X"],
+  "Eclectic Domestics": ["D","C","B","A","S1"],
+  "Extreme Track Toys": ["S1","S2","X"],
+  "GT Cars": ["A","S1","S2"],
+  "Hot Hatch": ["C","B","A","S1"],
+  "Hypercars": ["S1","S2","X"],
+  "Modern Muscle": ["B","A","S1","S2"],
+  "Modern Rally": ["B","A","S1"],
+  "Modern Sports Cars": ["B","A","S1","S2"],
+  "Modern Super Saloons": ["B","A","S1"],
+  "Modern Supercars": ["A","S1","S2","X"],
+  "Offroad": ["D","C","B","A","S1"],
+  "Pickups & 4x4's": ["D","C","B","A","S1"],
+  "Rally Monsters": ["A","S1","S2"],
+  "Rare Classics": ["D","C","B","A","S1"],
+  "Retro Hot Hatch": ["D","C","B","A","S1"],
+  "Retro Muscle": ["C","B","A","S1"],
+  "Retro Racers": ["C","B","A","S1","S2"],
+  "Retro Rally": ["C","B","A","S1"],
+  "Retro Sports Cars": ["D","C","B","A","S1"],
+  "Retro Super Saloons": ["C","B","A","S1"],
+  "Retro Supercars": ["B","A","S1","S2"],
+  "Rods and Customs": ["D","C","B","A","S1"],
+  "Sports Utility Heroes": ["C","B","A","S1"],
+  "Super GT": ["A","S1","S2"],
+  "Super Hot Hatch": ["B","A","S1"],
+  "Track Toys": ["A","S1","S2"],
+  "Unlimited Buggies": ["A","S1","S2"],
+  "Unlimited Offroad": ["A","S1","S2"],
+  "Utility Heroes": ["D","C","B","A"],
+  "UTV's": ["C","B","A","S1"]
+};
+
+function compatibilityEnabled() {
+  return $('#compatibilityToggle').checked;
+}
+
+function allowedClassesForCar(car) {
+  return CAR_CLASS_COMPAT[car] || CLASSES.map(c => c.name);
+}
+
+function carSupportsClass(car, className) {
+  return allowedClassesForCar(car).includes(className);
+}
+
+function eligibleCarsForClass(className) {
+  const pool = selectedCars();
+  if (!compatibilityEnabled() || !className) return pool;
+  return pool.filter(car => carSupportsClass(car, className));
+}
+
+function eligibleClassesForCar(car) {
+  const selected = selectedClasses();
+  if (!compatibilityEnabled() || !car) {
+    return CLASSES.filter(c => selected.includes(c.name));
+  }
+  const allowed = allowedClassesForCar(car);
+  return CLASSES.filter(c => selected.includes(c.name) && allowed.includes(c.name));
+}
+
+
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const state = {
+  locks: {car:false, class:false, event:false},
+  current: {car:null, class:null, event:null}
+};
+
+function choice(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function unique(arr) {
+  return [...new Set(arr)].sort((a,b)=>a.localeCompare(b));
+}
+
+function selectedClasses() {
+  return $$('#classChecks input:checked').map(x => x.value);
+}
+
+function selectedCars() {
+  return $$('#carTypeChecks input:checked').map(x => x.value);
+}
+
+function eligibleEvents() {
+  const activity = $('#activityFilter').value;
+  const discipline = $('#disciplineFilter').value;
+  const type = $('#typeFilter').value;
+  const temp = $('#tempFilter').value;
+
+  return EVENTS.filter(e => {
+    if (activity !== 'All' && e.activity !== activity) return false;
+    if (discipline !== 'All' && e.discipline !== discipline) return false;
+    if (type !== 'All' && e.type !== type) return false;
+    if (temp === 'permanent' && !e.permanent) return false;
+    if (temp === 'temporary' && e.permanent) return false;
+    return true;
+  });
+}
+
+function populateDependentFilters() {
+  const activity = $('#activityFilter').value;
+  const activityEvents = EVENTS.filter(e => activity === 'All' || e.activity === activity);
+
+  const oldDiscipline = $('#disciplineFilter').value;
+  const disciplines = unique(activityEvents.map(e=>e.discipline));
+  $('#disciplineFilter').innerHTML = '<option value="All">All disciplines</option>' +
+    disciplines.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+  if (disciplines.includes(oldDiscipline)) $('#disciplineFilter').value = oldDiscipline;
+
+  const discipline = $('#disciplineFilter').value;
+  const disciplineEvents = activityEvents.filter(e => discipline === 'All' || e.discipline === discipline);
+  const oldType = $('#typeFilter').value;
+  const types = unique(disciplineEvents.map(e=>e.type));
+  $('#typeFilter').innerHTML = '<option value="All">All event types</option>' +
+    types.map(v=>`<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
+  if (types.includes(oldType)) $('#typeFilter').value = oldType;
+
+  updateCounts();
+}
+
+function escapeHtml(v) {
+  return String(v).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
+
+function renderClassChecks() {
+  $('#classChecks').innerHTML = CLASSES.map(c => `
+    <label class="chip">
+      <input type="checkbox" value="${c.name}" checked>
+      <span>${c.name}</span>
+    </label>`).join('');
+}
+
+function renderCarChecks() {
+  $('#carTypeChecks').innerHTML = CAR_TYPES.map(c => `
+    <label>
+      <input type="checkbox" value="${escapeHtml(c)}" checked>
+      <span>${escapeHtml(c)}</span>
+    </label>`).join('');
+}
+
+function updateCounts() {
+  $('#eventCount').textContent = eligibleEvents().length;
+  $('#carTypeCount').textContent = `${selectedCars().length} / ${CAR_TYPES.length} selected`;
+}
+
+function renderResults() {
+  const c = state.current.car;
+  const cl = state.current.class;
+  const e = state.current.event;
+
+  $('#carResult').textContent = c || '—';
+  $('#carMeta').textContent = c && compatibilityEnabled()
+    ? `Allowed classes: ${allowedClassesForCar(c).join(', ')}`
+    : 'Forza category';
+
+  $('#classResult').textContent = cl ? cl.name : '—';
+  $('#classMeta').textContent = cl ? `PI ${cl.pi}` : 'PI range';
+
+  $('#eventResult').textContent = e ? e.name : '—';
+  $('#eventMeta').textContent = e
+    ? `${e.activity} · ${e.discipline} · ${e.type} · ${e.route}${e.permanent ? '' : ' · TEMPORARY'}`
+    : 'Activity · Discipline · Type';
+
+  const warning = $('#compatWarning');
+  if (compatibilityEnabled() && c && cl && !carSupportsClass(c, cl.name)) {
+    warning.textContent = `${c} and ${cl.name} are locked together but marked incompatible. Unlock either one or disable compatibility.`;
+    warning.style.display = 'block';
+  } else {
+    warning.style.display = 'none';
+  }
+
+  $$('[data-lock]').forEach(btn => {
+    const key = btn.dataset.lock;
+    btn.textContent = state.locks[key] ? '🔒' : '🔓';
+    btn.classList.toggle('locked', state.locks[key]);
+  });
+}
+
+function getEligibleClasses() {
+  return eligibleClassesForCar(state.current.car);
+}
+
+function rollPart(part) {
+  if (part === 'car') {
+    const lockedClass = state.locks.class && state.current.class
+      ? state.current.class.name
+      : null;
+    const pool = eligibleCarsForClass(lockedClass);
+
+    if (pool.length) {
+      state.current.car = choice(pool);
+
+      if (compatibilityEnabled() && state.current.class && !state.locks.class &&
+          !carSupportsClass(state.current.car, state.current.class.name)) {
+        const classPool = eligibleClassesForCar(state.current.car);
+        if (classPool.length) state.current.class = choice(classPool);
+      }
+    }
+  }
+
+  if (part === 'class') {
+    const pool = eligibleClassesForCar(state.current.car);
+    if (pool.length) state.current.class = choice(pool);
+  }
+
+  if (part === 'event') {
+    const pool = eligibleEvents();
+    if (pool.length) state.current.event = choice(pool);
+  }
+
+  renderResults();
+}
+
+function rollAll() {
+  const selectedClassPool = CLASSES.filter(c => selectedClasses().includes(c.name));
+  let candidateCars = selectedCars();
+
+  if (compatibilityEnabled() && state.locks.class && state.current.class) {
+    candidateCars = eligibleCarsForClass(state.current.class.name);
+  }
+
+  const poolsOk = candidateCars.length && selectedClassPool.length && eligibleEvents().length;
+  $('#emptyMessage').textContent = 'Your filters leave no eligible events, car types, or compatible classes.';
+  $('#emptyMessage').style.display = poolsOk ? 'none' : 'block';
+  $('#rollArea').style.opacity = poolsOk ? '1' : '.45';
+  if (!poolsOk) return;
+
+  // Car first. A locked class restricts which car categories can be selected.
+  if (!state.locks.car) {
+    const carPool = state.locks.class && state.current.class
+      ? eligibleCarsForClass(state.current.class.name)
+      : selectedCars();
+    if (carPool.length) state.current.car = choice(carPool);
+  }
+
+  // Class second. It must fit the selected/locked car type when compatibility is on.
+  if (!state.locks.class) {
+    const classPool = eligibleClassesForCar(state.current.car);
+    if (!classPool.length) {
+      $('#emptyMessage').textContent = 'None of your selected classes work with the chosen car type.';
+      $('#emptyMessage').style.display = 'block';
+      $('#rollArea').style.opacity = '.45';
+      renderResults();
+      return;
+    }
+    state.current.class = choice(classPool);
+  }
+
+  if (!state.locks.event) {
+    const eventPool = eligibleEvents();
+    if (eventPool.length) state.current.event = choice(eventPool);
+  }
+
+  renderResults();
+}
+
+function saveFilters() {
+  const data = {
+    activity: $('#activityFilter').value,
+    discipline: $('#disciplineFilter').value,
+    type: $('#typeFilter').value,
+    temp: $('#tempFilter').value,
+    compatibility: $('#compatibilityToggle').checked,
+    classes: selectedClasses(),
+    cars: selectedCars()
+  };
+  localStorage.setItem('fh6RandomizerFilters', JSON.stringify(data));
+}
+
+function restoreFilters() {
+  let saved;
+  try { saved = JSON.parse(localStorage.getItem('fh6RandomizerFilters')); } catch(e) {}
+  if (!saved) return;
+
+  if (saved.activity) $('#activityFilter').value = saved.activity;
+  populateDependentFilters();
+
+  if (saved.discipline && [...$('#disciplineFilter').options].some(o=>o.value===saved.discipline))
+    $('#disciplineFilter').value = saved.discipline;
+  populateDependentFilters();
+
+  if (saved.type && [...$('#typeFilter').options].some(o=>o.value===saved.type))
+    $('#typeFilter').value = saved.type;
+  if (saved.temp) $('#tempFilter').value = saved.temp;
+  if (typeof saved.compatibility === 'boolean')
+    $('#compatibilityToggle').checked = saved.compatibility;
+
+  if (Array.isArray(saved.classes)) {
+    $$('#classChecks input').forEach(x => x.checked = saved.classes.includes(x.value));
+  }
+  if (Array.isArray(saved.cars)) {
+    $$('#carTypeChecks input').forEach(x => x.checked = saved.cars.includes(x.value));
+  }
+  updateCounts();
+}
+
+function resetFilters() {
+  $('#activityFilter').value = 'All';
+  $('#tempFilter').value = 'all';
+  $('#compatibilityToggle').checked = true;
+  populateDependentFilters();
+  $('#disciplineFilter').value = 'All';
+  populateDependentFilters();
+  $('#typeFilter').value = 'All';
+  $$('#classChecks input').forEach(x => x.checked = true);
+  $$('#carTypeChecks input').forEach(x => x.checked = true);
+  localStorage.removeItem('fh6RandomizerFilters');
+  updateCounts();
+}
+
+renderClassChecks();
+renderCarChecks();
+populateDependentFilters();
+restoreFilters();
+rollAll();
+
+$('#activityFilter').addEventListener('change', () => { populateDependentFilters(); saveFilters(); });
+$('#disciplineFilter').addEventListener('change', () => { populateDependentFilters(); saveFilters(); });
+$('#typeFilter').addEventListener('change', () => { updateCounts(); saveFilters(); });
+$('#tempFilter').addEventListener('change', () => { updateCounts(); saveFilters(); });
+$('#compatibilityToggle').addEventListener('change', () => {
+  updateCounts();
+  saveFilters();
+  renderResults();
+});
+$('#classChecks').addEventListener('change', () => { updateCounts(); saveFilters(); });
+$('#carTypeChecks').addEventListener('change', () => { updateCounts(); saveFilters(); });
+
+$('#rollAll').addEventListener('click', rollAll);
+$('#rerollCar').addEventListener('click', () => rollPart('car'));
+$('#rerollClass').addEventListener('click', () => rollPart('class'));
+$('#rerollEvent').addEventListener('click', () => rollPart('event'));
+$('#resetFilters').addEventListener('click', () => { resetFilters(); rollAll(); });
+
+$('#selectAllCars').addEventListener('click', () => {
+  $$('#carTypeChecks input').forEach(x => x.checked = true);
+  updateCounts(); saveFilters();
+});
+$('#clearCars').addEventListener('click', () => {
+  $$('#carTypeChecks input').forEach(x => x.checked = false);
+  updateCounts(); saveFilters();
+});
+$('#toggleClasses').addEventListener('click', () => {
+  const boxes = $$('#classChecks input');
+  const allChecked = boxes.every(x=>x.checked);
+  boxes.forEach(x=>x.checked = !allChecked);
+  updateCounts(); saveFilters();
+});
+
+$$('[data-lock]').forEach(btn => btn.addEventListener('click', () => {
+  const key = btn.dataset.lock;
+  state.locks[key] = !state.locks[key];
+  renderResults();
+}));
+</script>
+</body>
+</html>
