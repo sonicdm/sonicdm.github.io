@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>sonicdm</title>
+  <meta name="description" content="Projects by sonicdm — interactive web experiments and tools.">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --panel: #151922;
+      --text: #f5f7fb;
+      --muted: #9aa4b2;
+      --line: #2b3444;
+      --accent: #6de2ff;
+      --accent2: #f44dd0;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% -5%, rgba(109, 226, 255, .14), transparent 34rem),
+        radial-gradient(circle at 95% 5%, rgba(244, 77, 208, .12), transparent 30rem),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      width: min(860px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 56px 0 72px;
+    }
+
+    header {
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      line-height: .95;
+      letter-spacing: -.045em;
+    }
+
+    .tagline {
+      margin: 14px 0 0;
+      color: var(--muted);
+      max-width: 52ch;
+      font-size: 1.05rem;
+    }
+
+    .projects {
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      display: grid;
+      gap: 10px;
+      padding: 22px 24px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .015));
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      transition: border-color .18s ease, transform .18s ease, background .18s ease;
+    }
+
+    .card:hover,
+    .card:focus-within {
+      border-color: rgba(109, 226, 255, .45);
+      transform: translateY(-2px);
+      background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -.02em;
+    }
+
+    .arrow {
+      color: var(--accent);
+      font-size: 1.2rem;
+      flex-shrink: 0;
+      transition: transform .18s ease;
+    }
+
+    .card:hover .arrow,
+    .card:focus-within .arrow {
+      transform: translateX(4px);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 62ch;
+    }
+
+    .pill {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+
+    .pill.pink { color: #f8a8e8; border-color: rgba(244, 77, 208, .35); }
+    .pill.blue { color: #9de9ff; border-color: rgba(109, 226, 255, .35); }
+
+    footer {
+      margin-top: 48px;
+      color: var(--muted);
+      font-size: .92rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <h1>sonicdm</h1>
+      <p class="tagline">Interactive web projects — games, simulations, and small tools hosted on GitHub Pages.</p>
+    </header>
+
+    <section class="projects" aria-label="Projects">
+      <a class="card" href="./fh6randomizer/">
+        <div class="card-top">
+          <h2>FH6 Randomizer</h2>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <p>Pick a random car category, performance class, and event from the Forza Horizon 6 datasets. Filter the pools, lock anything you like, then reroll the rest.</p>
+        <span class="pill pink">Forza Horizon 6</span>
+      </a>
+
+      <a class="card" href="./webgl-erosion-enhanced/">
+        <div class="card-top">
+          <h2>Terrain Erosion</h2>
+          <span class="arrow" aria-hidden="true">→</span>
+        </div>
+        <p>Real-time WebGL terrain generation with hydraulic erosion simulation. Explore procedurally sculpted landscapes in the browser.</p>
+        <span class="pill blue">WebGL</span>
+      </a>
+    </section>
+
+    <footer>
+      <a href="https://github.com/sonicdm/sonicdm.github.io">View source on GitHub</a>
+    </footer>
+  </main>
+</body>
+</html>
